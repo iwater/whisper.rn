@@ -385,12 +385,16 @@ void AudioInputCallback(void * inUserData,
     NSMutableArray *segments = [[NSMutableArray alloc] init];
     for (int i = 0; i < n_segments; i++) {
         const char * text_cur = whisper_full_get_segment_text(self->ctx, i);
-        result = [result stringByAppendingString:[NSString stringWithUTF8String:text_cur]];
+        
+        NSString *stringToAdd = [NSString stringWithUTF8String:text_cur];
+        if (stringToAdd != nil) {
+            result = [result stringByAppendingString:stringToAdd];
+        }
 
         const int64_t t0 = whisper_full_get_segment_t0(self->ctx, i);
         const int64_t t1 = whisper_full_get_segment_t1(self->ctx, i);
         NSDictionary *segment = @{
-            @"text": [NSString stringWithUTF8String:text_cur],
+            @"text": (stringToAdd != nil) ? stringToAdd : @"[_NIL_]",
             @"t0": [NSNumber numberWithLongLong:t0],
             @"t1": [NSNumber numberWithLongLong:t1]
         };
